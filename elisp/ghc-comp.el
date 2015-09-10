@@ -66,21 +66,25 @@ unloaded modules are loaded")
 
 (defvar ghc-loaded-module nil)
 
+(defvar ghc-boot-symbols '(ghc-module-names
+			   ghc-language-extensions
+			   ghc-option-flags
+			   ;; hard coded in GHCMod.hs
+			   ghc-keyword-Prelude
+			   ghc-keyword-Control.Applicative
+			   ghc-keyword-Control.Exception
+			   ghc-keyword-Control.Monad
+			   ghc-keyword-Data.Char
+			   ghc-keyword-Data.List
+			   ghc-keyword-Data.Maybe
+			   ghc-keyword-System.IO))
+
 (defun ghc-comp-init ()
-  (let* ((syms '(ghc-module-names
-		 ghc-language-extensions
-		 ghc-option-flags
-		 ;; hard coded in GHCMod.hs
-		 ghc-keyword-Prelude
-		 ghc-keyword-Control.Applicative
-		 ghc-keyword-Control.Exception
-		 ghc-keyword-Control.Monad
-		 ghc-keyword-Data.Char
-		 ghc-keyword-Data.List
-		 ghc-keyword-Data.Maybe
-		 ghc-keyword-System.IO))
-	 (vals (ghc-boot (length syms))))
-    (ghc-set syms vals))
+  (message "Initializing...")
+  (ghc-async-process "boot\n" (length ghc-boot-symbols) 'ghc-boot-hook))
+
+(defun ghc-boot-hook (vals)
+  (ghc-set ghc-boot-symbols vals)
   (ghc-add ghc-module-names "qualified")
   (ghc-add ghc-module-names "hiding")
   ;; hard coded in GHCMod.hs
@@ -91,18 +95,13 @@ unloaded modules are loaded")
 			"Data.Char"
 			"Data.List"
 			"Data.Maybe"
-			"System.IO")))
+			"System.IO"))
+  (message "Initializing...done"))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;
 ;;; Executing command
 ;;;
-
-(defun ghc-boot (n)
-  (prog2
-      (message "Initializing...")
-      (ghc-sync-process "boot\n" n)
-    (message "Initializing...done")))
 
 (defun ghc-load-modules (mods)
   (if mods

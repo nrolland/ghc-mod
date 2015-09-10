@@ -121,7 +121,7 @@
     (defadvice save-buffer (after ghc-check-syntax-on-save activate)
       "Check syntax with GHC when a haskell-mode buffer is saved."
       (when (eq 'haskell-mode major-mode) (ghc-check-syntax))))
-  (ghc-import-module)
+;;  (ghc-import-module) ;; fixme
   (ghc-check-syntax))
 
 (defun ghc-abbrev-init ()

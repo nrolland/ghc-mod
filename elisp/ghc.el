@@ -84,7 +84,7 @@
    ?\C-h))
 
 (defvar ghc-mod-key-varaibles-depricated-notice
-  "Since ghc-mod 5.1.0.0 using ghc-*-key variables to change
+  "Since ghc-mod 5.3.0.0 using ghc-*-key variables to change
 keybindings is deprecated, setting them will be ignored. Use the
 `define-key' function to change `ghc-mod-mode-map' in a
 `ghc-mod-mode-hook' instead.")
@@ -230,8 +230,15 @@ keybindings is deprecated, setting them will be ignored. Use the
   (ghc-abbrev-deinit)
   )
 
-(defvar ghc-mod-default-lighter " Gᷟ")
-(defvar-local ghc-mod-lighter ghc-mod-default-lighter)
+(defface ghc-mod-lighter-logo-face
+  '( (t :family "GhcModLogo") )
+
+
+;   '((t ; ((supports :family))   ))
+
+
+  "Face to get Emacs to display our logo in the modeline."
+  :group 'ghc)
 
 (defun ghc-abbrev-init ()
   (set (make-local-variable 'dabbrev-case-fold-search) nil))
@@ -246,7 +253,7 @@ With a prefix argument ARG, enable ghc-mod mode if ARG is
 positive, and disable it otherwise.  If called from Lisp, enable
 the mode if ARG is omitted or nil, and toggle it if ARG is `toggle'."
   :init-value nil
-  :lighter ghc-mod-lighter
+  :lighter #(" gm" 0 2 (face ghc-mod-lighter-logo-face)) ; (propertize " hello" 'face 'bold)
   :keymap ghc-mod-mode-map
   :group 'ghc-mod
 

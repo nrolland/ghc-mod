@@ -122,8 +122,8 @@ defaultOptions = Options {
     , ooptLinePrefix     = Nothing
     }
   , optPrograms       = Programs {
-      ghcProgram     = "ghc"
-    , ghcPkgProgram  = "ghc-pkg"
+      ghcProgram     = "ghcjs"
+    , ghcPkgProgram  = "ghcjs-pkg"
     , cabalProgram   = "cabal"
     , stackProgram   = "stack"
     }

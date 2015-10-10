@@ -175,6 +175,7 @@ Library
                       , fclabels == 2.0.*
                       , extra == 1.4.*
                       , pipes == 4.1.*
+                      , ghcjs
   if impl(ghc < 7.8)
     Build-Depends:      convertible
   if impl(ghc < 7.5)

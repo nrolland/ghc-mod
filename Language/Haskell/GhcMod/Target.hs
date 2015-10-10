@@ -25,6 +25,11 @@ import GHC.Paths (libdir)
 import SysTools
 import DynFlags
 
+import qualified Compiler.Settings      as GHCJS
+import qualified Compiler.GhcjsPlatform as GHCJS
+import qualified Compiler.GhcjsProgram  as GHCJS
+import Data.Char (isSpace)
+
 import Language.Haskell.GhcMod.DynFlags
 import Language.Haskell.GhcMod.Monad.Types
 import Language.Haskell.GhcMod.CabalHelper
@@ -83,8 +88,25 @@ initSession opts mdf = do
      gmsPut s { gmGhcSession = Just $ GmGhcSession opts rghc }
 
    newSession Cradle { cradleTempDir } = liftIO $ do
-     runGhc (Just libdir) $ do
+     -----------------------------------------------------------------------
+     -- fixme, figure out the correct way to read this for the compiler used
+     let trim = let f = reverse . dropWhile isSpace in f . f
+     ghcjsLibdir <- trim <$> readProcess "ghcjs" ["--print-libdir"] ""
+     -----------------------------------------------------------------------
+     ghcjsEnv <- GHCJS.newGhcjsEnv
+     runGhc (Just ghcjsLibdir) $ do
        let setDf df = setTmpDir cradleTempDir <$> (mdf =<< addCmdOpts opts df)
+       -- fixme: can we always use the default settings?
+       let ghcjsSettings :: GHCJS.GhcjsSettings
+           ghcjsSettings = mempty
+       -- initialize GHCJS session
+       dflags0 <- getSessionDynFlags
+       _ <- setSessionDynFlags
+         $ GHCJS.setGhcjsPlatform ghcjsSettings ghcjsEnv [] ghcjsLibdir
+         $ updateWays $ addWay' (WayCustom "js")
+         $ GHCJS.setGhcjsSuffixes False dflags0
+       GHCJS.fixNameCache
+       -- end GHCJS
        _ <- setSessionDynFlags =<< setDf =<< getSessionDynFlags
        getSession
 
